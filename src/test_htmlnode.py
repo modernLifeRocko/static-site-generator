@@ -9,7 +9,7 @@ class HTMLNodeTest(unittest.TestCase):
                         {'color': 'black', 'margin': 'auto'})
         print(node)
         propsstr = node.props_to_html()
-        self.assertEqual(propsstr, ' color: black margin: auto')
+        self.assertEqual(propsstr, ' color= black margin= auto')
 
     def testnopropschild(self):
         node1 = HTMLNode('li', 'first list item')
@@ -26,4 +26,4 @@ class HTMLNodeTest(unittest.TestCase):
         pnode = HTMLNode('div', None, [node1], {'margin': 'auto'})
 
         pstr = pnode.props_to_html()
-        self.assertEqual(pstr, ' margin: auto')
+        self.assertEqual(pstr, ' margin= auto')

@@ -16,7 +16,7 @@ class HTMLNode():
         if self.props is None:
             return propstr
         for key, val in self.props.items():
-            propstr += f" {key}: {val}"
+            propstr += f" {key}= {val}"
         return propstr
 
     def __repr__(self):
