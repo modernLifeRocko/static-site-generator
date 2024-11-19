@@ -42,5 +42,26 @@ class LeafNode(HTMLNode):
 
         if self.tag == 'img':
             return f'<{self.tag}{self.props_to_html()}/>'
-        else:
-            return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
+
+        return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
+
+
+class ParentNode(HTMLNode):
+    def __init__(self, tag: str,
+                 children: list[HTMLNode],
+                 props: dict[str, str] | None = None):
+        super().__init__(tag, None, children, props)
+
+    def to_html(self):
+        if self.tag is None:
+            raise ValueError('Tag, not it')
+
+        if self.children is None:
+            raise ValueError('A Parent must have a Child')
+
+        sep = "\n"
+        fstr = f"<{self.tag}{self.props_to_html()}>{sep}"
+        fstr += f"{sep.join([cstr.to_html() for cstr in self.children])}"
+        fstr += f"{sep}</{self.tag}>"
+        print(fstr)
+        return fstr
