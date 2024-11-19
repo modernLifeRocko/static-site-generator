@@ -16,7 +16,7 @@ class HTMLNode():
         if self.props is None:
             return propstr
         for key, val in self.props.items():
-            propstr += f" {key}= {val}"
+            propstr += f" {key}={val}"
         return propstr
 
     def __repr__(self):
@@ -31,13 +31,16 @@ class LeafNode(HTMLNode):
     def __init__(self, tag: str | None,
                  value: str,
                  props: dict[str, str] | None = None):
-        super().__init__(tag, value, None, dict)
+        super().__init__(tag, value, None, props)
 
     def to_html(self):
+        if self.value is None:
+            raise ValueError
+
         if self.tag is None:
             return self.value
 
         if self.tag == 'img':
             return f'<{self.tag}{self.props_to_html()}/>'
         else:
-            return f"<{self.tag}{self.props_to_html}>{self.value}</{self.tag}>"
+            return f"<{self.tag}{self.props_to_html()}>{self.value}</{self.tag}>"
