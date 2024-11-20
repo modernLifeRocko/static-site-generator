@@ -75,7 +75,11 @@ class ParentNodeTest(unittest.TestCase):
         lnode = ParentNode('ol', [item1, item2])
         desc = LeafNode('p', 'i explain the list here')
         node = ParentNode('div', [desc, lnode], {'background-color': 'red'})
-        node_str="<div background-color=red>\n<p>i explain the list here</p>\n<ol>\n<li>First item</li>\n<li>Second item</li>\n</ol>\n</div>"
+        node_str = "<div background-color=red>\n<p>i explain the list here</p>\n<ol>\n<li>First item</li>\n<li>Second item</li>\n</ol>\n</div>"
         nodehtml = node.to_html()
-        print(node_str)
+        # print(node_str)
         self.assertEqual(node_str, nodehtml)
+
+
+if __name__ == "__main__":
+    unittest.main()

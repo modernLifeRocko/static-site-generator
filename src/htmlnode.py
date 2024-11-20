@@ -19,6 +19,13 @@ class HTMLNode():
             propstr += f" {key}={val}"
         return propstr
 
+    def __eq__(self, o):
+        sameTag = self.tag == o.tag
+        sameVal = self.value == o.value
+        sameChildren = self.children == o.children
+        sameProps = self.props == o.props
+        return sameTag and sameVal and sameProps and sameChildren
+    
     def __repr__(self):
         return f'''
         tag: {self.tag}
@@ -63,5 +70,4 @@ class ParentNode(HTMLNode):
         fstr = f"<{self.tag}{self.props_to_html()}>{sep}"
         fstr += f"{sep.join([cstr.to_html() for cstr in self.children])}"
         fstr += f"{sep}</{self.tag}>"
-        print(fstr)
         return fstr
