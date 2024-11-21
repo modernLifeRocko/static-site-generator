@@ -6,8 +6,8 @@ from textnode import TextNode
 
 class NodeSplitTest(unittest.TestCase):
     def testinlinebold(self):
-        node = TextNode('this is *important*, i think', 'text')
-        split_nodes = split_nodes_delimiter([node], '*', 'bold')
+        node = TextNode('this is **important**, i think', 'text')
+        split_nodes = split_nodes_delimiter([node], '**', 'bold')
         goal = [
             TextNode('this is ', 'text'),
             TextNode('important', 'bold'),
@@ -34,8 +34,8 @@ class NodeSplitTest(unittest.TestCase):
         self.assertEqual(goal, split_nodes)
 
     def testmultibold(self):
-        node = TextNode('This *is* important. So is *this*', 'text')
-        split_nodes = split_nodes_delimiter([node], '*', 'bold')
+        node = TextNode('This **is** important. So is **this**', 'text')
+        split_nodes = split_nodes_delimiter([node], '**', 'bold')
         goal = [
             TextNode('This ', 'text'),
             TextNode('is', 'bold'),
