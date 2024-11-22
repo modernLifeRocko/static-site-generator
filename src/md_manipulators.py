@@ -32,9 +32,54 @@ def extract_markdown_images(text: str) -> list[tuple[str, str]]:
 
 
 def extract_markdown_links(text: str) -> list[tuple[str, str]]:
-    pat = r'[^!]\[(.+?)\]\((.+?)\)'
+    pat = r'(?<!!)\[(.+?)\]\((.+?)\)'
     return re.findall(pat, text)
 
+
+def split_nodes_image(old_nodes: list[TextNode]) -> list[TextNode]:
+    pat = r'!\[.+?\]\(.+?\)'
+    new_nodes = []
+    for node in old_nodes:
+        txt = node.text
+        if node.text_type != 'text':
+            new_nodes.append(node)
+            continue
+        slices = re.split(pat, txt)
+        imgs = extract_markdown_images(txt)
+        t = len(imgs) + len(slices)
+        for i in range(t):
+            if i % 2 == 0:
+                slice_txt = slices[i//2]
+                if slice_txt != '':
+                    new_nodes.append(TextNode(slice_txt, 'text'))
+            else:
+                alt, src = imgs[i//2]
+                new_nodes.append(TextNode('', 'image',
+                                          {'src': src, 'alt': alt}))
+    return new_nodes
+
+
+def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
+    pat = r'(?<!!)\[.+?\]\(.+?\)'
+    new_nodes = []
+    for node in old_nodes:
+        txt = node.text
+        if node.text_type != 'text':
+            new_nodes.append(node)
+            continue
+        slices = re.split(pat, txt)
+        links = extract_markdown_links(txt)
+        t = len(links) + len(slices)
+        for i in range(t):
+            if i % 2 == 0:
+                slice_txt = slices[i//2]
+                if slice_txt != '':
+                    new_nodes.append(TextNode(slice_txt, 'text'))
+            else:
+                alt, src = links[i//2]
+                new_nodes.append(TextNode(alt, 'link',
+                                          {'href': src}))
+    return new_nodes
 
 # def split_nodes_delimiter2(old_nodes: list[TextNode],
 #                           delimiter: str,

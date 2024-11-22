@@ -3,7 +3,9 @@ import unittest
 from md_manipulators import (
     split_nodes_delimiter,
     extract_markdown_images,
-    extract_markdown_links
+    extract_markdown_links,
+    split_nodes_image,
+    split_nodes_link
 )
 
 from textnode import TextNode
@@ -70,7 +72,9 @@ class LinkXtractTest(unittest.TestCase):
 
     def test1link(self):
         mdtxt = 'Go [here](https://en.wikipedia.org/wiki/Never_Gonna_Give_You_Up)'
-        links = [('here', 'https://en.wikipedia.org/wiki/Never_Gonna_Give_You_Up')]
+        links = [
+            ('here', 'https://en.wikipedia.org/wiki/Never_Gonna_Give_You_Up')
+        ]
         self.assertEqual(links, extract_markdown_links(mdtxt))
 
     def test2link(self):
@@ -78,6 +82,55 @@ class LinkXtractTest(unittest.TestCase):
         links = [("to boot dev", "https://www.boot.dev"),
                  ("to youtube", "https://www.youtube.com/@bootdotdev")]
         self.assertEqual(links, extract_markdown_links(text))
+
+
+class SplitImgsTest(unittest.TestCase):
+    def test1img(self):
+        node1 = TextNode(
+            'see this: ![alt text](dir/to/img)', 'text')
+        goal = [
+            TextNode('see this: ', 'text'),
+            TextNode('', 'image', {'alt': 'alt text', 'src': 'dir/to/img'})
+        ]
+        self.assertEqual(goal, split_nodes_image([node1]))
+
+    def testnoimg(self):
+        node = TextNode('watch my [guns](dir/to/guns]', 'text')
+        goal = [node]
+        self.assertEqual(goal, split_nodes_image([node]))
+
+
+class SplitLinxTest(unittest.TestCase):
+    def testnolink(self):
+        node1 = TextNode(
+            'see this: ![alt text](dir/to/img)', 'text')
+        goal = [
+            node1
+        ]
+        self.assertEqual(goal, split_nodes_link([node1]))
+
+    def test2links(self):
+        node = TextNode('see [here](file) or [here](file2)', 'text')
+        goal = [
+            TextNode('see ', 'text'),
+            TextNode('here', 'link', {'href': 'file'}),
+            TextNode(' or ', 'text'),
+            TextNode('here', 'link', {'href': 'file2'})
+        ]
+        self.assertEqual(goal, split_nodes_link([node]))
+
+    def testlistlinks(self):
+        node1 = TextNode('see [this](file) for more.', 'text')
+        node2 = TextNode('or go [here](file2) for even more', 'text')
+        goal = [
+            TextNode('see ', 'text'),
+            TextNode('this', 'link', {'href': 'file'}),
+            TextNode(' for more.', 'text'),
+            TextNode('or go ', 'text'),
+            TextNode('here', 'link', {'href': 'file2'}),
+            TextNode(' for even more', 'text')
+        ]
+        self.assertEqual(goal, split_nodes_link([node1, node2]))
 
 
 if __name__ == "__main__":
