@@ -1,4 +1,5 @@
 from textnode import TextNode
+import re
 
 
 def split_nodes_delimiter(old_nodes: list[TextNode],
@@ -16,15 +17,23 @@ def split_nodes_delimiter(old_nodes: list[TextNode],
             raise ValueError('Invalid md')
 
         for i, slice in enumerate(slices):
-            if slice == '':
-                pass
-            else:
+            if slice != '':
                 if i % 2 == 0:
                     new_nodes.append(TextNode(slice, 'text'))
                 else:
                     new_nodes.append(TextNode(slice, text_type))
 
     return new_nodes
+
+
+def extract_markdown_images(text: str) -> list[tuple[str, str]]:
+    pat = r'!\[(.+?)\]\((.+?)\)'
+    return re.findall(pat, text)
+
+
+def extract_markdown_links(text: str) -> list[tuple[str, str]]:
+    pat = r'[^!]\[(.+?)\]\((.+?)\)'
+    return re.findall(pat, text)
 
 
 # def split_nodes_delimiter2(old_nodes: list[TextNode],

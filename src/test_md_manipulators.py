@@ -1,6 +1,11 @@
 import unittest
 
-from md_manipulators import split_nodes_delimiter
+from md_manipulators import (
+    split_nodes_delimiter,
+    extract_markdown_images,
+    extract_markdown_links
+)
+
 from textnode import TextNode
 
 
@@ -43,3 +48,37 @@ class NodeSplitTest(unittest.TestCase):
             TextNode('this', 'bold')
         ]
         self.assertEqual(goal, split_nodes)
+
+
+class ImgXtractTest(unittest.TestCase):
+    def test1img(self):
+        mdtxt = 'See this ![photo](img/to/pic). Cute right?'
+        imgs = [('photo', 'img/to/pic')]
+        self.assertEqual(imgs, extract_markdown_images(mdtxt))
+
+    def test2img(self):
+        text = "This is text with a ![rick roll](https://i.imgur.com/aKaOqIh.gif) and ![obi wan](https://i.imgur.com/fJRm4Vk.jpeg)"
+        imgs = [("rick roll", "https://i.imgur.com/aKaOqIh.gif"),
+                ("obi wan", "https://i.imgur.com/fJRm4Vk.jpeg")]
+        self.assertEqual(imgs, extract_markdown_images(text))
+
+
+class LinkXtractTest(unittest.TestCase):
+    def testnoimg(self):
+        mdtxt = 'See this ![photo](img/to/pic). Cute right?'
+        self.assertEqual([], extract_markdown_links(mdtxt))
+
+    def test1link(self):
+        mdtxt = 'Go [here](https://en.wikipedia.org/wiki/Never_Gonna_Give_You_Up)'
+        links = [('here', 'https://en.wikipedia.org/wiki/Never_Gonna_Give_You_Up')]
+        self.assertEqual(links, extract_markdown_links(mdtxt))
+
+    def test2link(self):
+        text = "This is text with a link [to boot dev](https://www.boot.dev) and [to youtube](https://www.youtube.com/@bootdotdev)"
+        links = [("to boot dev", "https://www.boot.dev"),
+                 ("to youtube", "https://www.youtube.com/@bootdotdev")]
+        self.assertEqual(links, extract_markdown_links(text))
+
+
+if __name__ == "__main__":
+    unittest.main()
