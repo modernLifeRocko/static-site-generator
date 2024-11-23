@@ -1,6 +1,14 @@
 from textnode import TextNode
 import re
 
+delim2type = {
+    '**': 'bold',
+    '__': 'bold',
+    '*': 'italic',
+    '_': 'italic',
+    '`': 'code'
+}
+
 
 def split_nodes_delimiter(old_nodes: list[TextNode],
                           delimiter: str,
@@ -54,8 +62,7 @@ def split_nodes_image(old_nodes: list[TextNode]) -> list[TextNode]:
                     new_nodes.append(TextNode(slice_txt, 'text'))
             else:
                 alt, src = imgs[i//2]
-                new_nodes.append(TextNode('', 'image',
-                                          {'src': src, 'alt': alt}))
+                new_nodes.append(TextNode(alt, 'image', src))
     return new_nodes
 
 
@@ -77,9 +84,19 @@ def split_nodes_link(old_nodes: list[TextNode]) -> list[TextNode]:
                     new_nodes.append(TextNode(slice_txt, 'text'))
             else:
                 alt, src = links[i//2]
-                new_nodes.append(TextNode(alt, 'link',
-                                          {'href': src}))
+                new_nodes.append(TextNode(alt, 'link', src))
     return new_nodes
+
+
+def text_to_textnodes(text: str) -> list[TextNode]:
+    # check me out
+    root_node = TextNode(text, "text")
+    nodes = split_nodes_image([root_node])
+    nodes = split_nodes_link(nodes)
+    for delim, ttype in delim2type.items():
+        nodes = split_nodes_delimiter(nodes, delim, ttype)
+
+    return nodes
 
 # def split_nodes_delimiter2(old_nodes: list[TextNode],
 #                           delimiter: str,

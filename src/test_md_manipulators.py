@@ -1,6 +1,7 @@
 import unittest
 
 from md_manipulators import (
+    text_to_textnodes,
     split_nodes_delimiter,
     extract_markdown_images,
     extract_markdown_links,
@@ -90,7 +91,7 @@ class SplitImgsTest(unittest.TestCase):
             'see this: ![alt text](dir/to/img)', 'text')
         goal = [
             TextNode('see this: ', 'text'),
-            TextNode('', 'image', {'alt': 'alt text', 'src': 'dir/to/img'})
+            TextNode('alt text', 'image', 'dir/to/img')
         ]
         self.assertEqual(goal, split_nodes_image([node1]))
 
@@ -113,9 +114,9 @@ class SplitLinxTest(unittest.TestCase):
         node = TextNode('see [here](file) or [here](file2)', 'text')
         goal = [
             TextNode('see ', 'text'),
-            TextNode('here', 'link', {'href': 'file'}),
+            TextNode('here', 'link', 'file'),
             TextNode(' or ', 'text'),
-            TextNode('here', 'link', {'href': 'file2'})
+            TextNode('here', 'link', 'file2')
         ]
         self.assertEqual(goal, split_nodes_link([node]))
 
@@ -124,13 +125,31 @@ class SplitLinxTest(unittest.TestCase):
         node2 = TextNode('or go [here](file2) for even more', 'text')
         goal = [
             TextNode('see ', 'text'),
-            TextNode('this', 'link', {'href': 'file'}),
+            TextNode('this', 'link', 'file'),
             TextNode(' for more.', 'text'),
             TextNode('or go ', 'text'),
-            TextNode('here', 'link', {'href': 'file2'}),
+            TextNode('here', 'link', 'file2'),
             TextNode(' for even more', 'text')
         ]
         self.assertEqual(goal, split_nodes_link([node1, node2]))
+
+
+class Text2Nodes(unittest.TestCase):
+    def testoneofall(self):
+        text = "This is **text** with an *italic* word and a `code block` and an ![obi wan image](https://i.imgur.com/fJRm4Vk.jpeg) and a [link](https://boot.dev)" 
+        goal = [
+            TextNode("This is ", 'text'),
+            TextNode("text", 'bold'),
+            TextNode(" with an ", "text"),
+            TextNode("italic", 'italic'),
+            TextNode(" word and a ", 'text'),
+            TextNode("code block", 'code'),
+            TextNode(" and an ", 'text'),
+            TextNode("obi wan image", 'image', "https://i.imgur.com/fJRm4Vk.jpeg"),
+            TextNode(" and a ", 'text'),
+            TextNode("link", 'link', "https://boot.dev"),
+        ]
+        self.assertEqual(goal, text_to_textnodes(text))
 
 
 if __name__ == "__main__":
